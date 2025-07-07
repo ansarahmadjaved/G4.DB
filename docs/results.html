@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G4 Analysis Results - G4 Omics Database</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.24.1/plotly.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h2 {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .back-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Query Summary */
+        .query-summary {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .query-summary h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .query-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .query-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .query-item label {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .query-item span {
+            display: block;
+            margin-top: 5px;
+            font-family: monospace;
+            background: white;
+            padding: 8px;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+
+        /* Section Styles */
+        .analysis-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Charts Container */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-box {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+            text-align: center;
+        }
+
+        /* Data Table */
+        .data-table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .data-table th {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .rank-badge {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        /* Structure Viewer */
+        .structure-viewer {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .structure-placeholder {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: #666;
+            border: 2px dashed #ccc;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .query-info {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+
+            .main-container {
+                padding: 20px 10px;
+            }
+        }
+
+        /* Results Summary */
+        .results-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .summary-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h2>G4 Omics DB</h2>
+            </div>
+            <a href="#" class="back-btn" onclick="goBack()">← Back to Search</a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Query Summary -->
+        <div class="query-summary">
+            <h2>Analysis Query Summary</h2>
+            <div class="query-info">
+                <div class="query-item">
+                    <label>Input Sequence:</label>
+                    <span id="input-sequence">GTGGGAGGGGCCGGTGTGAGGCAAGGGG</span>
+                </div>
+                <div class="query-item">
+                    <label>Cell Type:</label>
+                    <span id="cell-type">HEK293</span>
+                </div>
+                <div class="query-item">
+                    <label>Chromatin Profile:</label>
+                    <span id="chromatin-profile">Yes</span>
+                </div>
+                <div class="query-item">
+                    <label>Epigenetic Profile:</label>
+                    <span id="epigenetic-profile">Yes</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Summary -->
+        <div class="results-summary">
+            <div class="summary-card">
+                <div class="summary-value">85%</div>
+                <div class="summary-label">G4 Formation Probability</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">12</div>
+                <div class="summary-label">Experimental Matches</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">-28.5</div>
+                <div class="summary-label">Folding Energy (kcal/mol)</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">7.2</div>
+                <div class="summary-label">Stability Score</div>
+            </div>
+        </div>
+
+        <!-- Section 1: Computational Prediction -->
+        <section class="analysis-section">
+            <h3 class="section-title">
+                <div class="section-icon">1</div>
+                Computational Prediction of G4
+            </h3>
+            
+            <div class="charts-container">
+                <div class="chart-box">
+                    <div class="chart-title">G4 Formation Probability</div>
+                    <canvas id="probabilityChart" width="400" height="200"></canvas>
+                </div>
+                <div class="chart-box">
+                    <div class="chart-title">Sequence Position Analysis</div>
+                    <div id="sequenceAnalysis" style="width: 100%; height: 200px;"></div>
+                </div>
+                <div class="chart-box">
+                    <div class="chart-title">Thermodynamic Stability</div>
+                    <canvas id="stabilityChart" width="400" height="200"></canvas>
+                </div>
+                <div class="chart-box">
+                    <div class="chart-title">Loop Length Distribution</div>
+                    <canvas id="loopChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Experimental Identification -->
+        <section class="analysis-section">
+            <h3 class="section-title">
+                <div class="section-icon">2</div>
+                Experimental Identification of G4
+            </h3>
+            
+            <div class="charts-container">
+                <div class="chart-box">
+                    <div class="chart-title">ChIP-seq Peak Analysis</div>
+                    <div id="chipseqPlot" style="width: 100%; height: 300px;"></div>
+                </div>
+                <div class="chart-box">
+                    <div class="chart-title">Cell Type Comparison</div>
+                    <canvas id="cellTypeChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <div class="data-table-container">
+                <div class="chart-title">Ranked Experimental Evidence</div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Experiment ID</th>
+                            <th>Cell Type</th>
+                            <th>Method</th>
+                            <th>Confidence Score</th>
+                            <th>Peak Intensity</th>
+                            <th>Publication</th>
+                        </tr>
+                    </thead>
+                    <tbody id="experimentalData">
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 3: Secondary Structure Analysis -->
+        <section class="analysis-section">
+            <h3 class="section-title">
+                <div class="section-icon">3</div>
+                Secondary Structure Modeling
+            </h3>
+            
+            <div class="charts-container">
+                <div class="chart-box">
+                    <div class="chart-title">Folding Energy Landscape</div>
+                    <div id="energyLandscape" style="width: 100%; height: 300px;"></div>
+                </div>
+                <div class="chart-box">
+                    <div class="chart-title">Structure Stability over Temperature</div>
+                    <canvas id="temperatureChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <div class="structure-viewer">
+                <div class="chart-title">Predicted G4 Structure</div>
+                <div class="structure-placeholder">
+                    <div>
+                        <div class="loading"></div>
+                        <div style="margin-top: 10px;">Loading 3D Structure Model...</div>
+                        <div style="margin-top: 10px; font-size: 0.9em; color: #999;">
+                            Interactive 3D visualization will appear here
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Simulate loading data from URL parameters or form submission
+        function loadQueryData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            document.getElementById('input-sequence').textContent = urlParams.get('sequence') || 'GTGGGAGGGGCCGGTGTGAGGCAAGGGG';
+            document.getElementById('cell-type').textContent = urlParams.get('cellType') || 'HEK293';
+            document.getElementById('chromatin-profile').textContent = urlParams.get('chromatin') || 'Yes';
+            document.getElementById('epigenetic-profile').textContent = urlParams.get('epigenetic') || 'Yes';
+        }
+
+        // Initialize all charts and data
+        function initializeAnalysis() {
+            createProbabilityChart();
+            createSequenceAnalysis();
+            createStabilityChart();
+            createLoopChart();
+            createChipseqPlot();
+            createCellTypeChart();
+            createEnergyLandscape();
+            createTemperatureChart();
+            populateExperimentalData();
+        }
+
+        // Chart 1: G4 Formation Probability
+        function createProbabilityChart() {
+            const ctx = document.getElementById('probabilityChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['G4 Formation', 'No Formation'],
+                    datasets: [{
+                        data: [85, 15],
+                        backgroundColor: ['#667eea', '#e9ecef'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 2: Sequence Position Analysis
+        function createSequenceAnalysis() {
+            const sequence = 'GTGGGAGGGGCCGGTGTGAGGCAAGGGG';
+            const positions = Array.from({length: sequence.length}, (_, i) => i + 1);
+            const scores = positions.map(p => Math.random() * 0.8 + 0.2);
+
+            const trace = {
+                x: positions,
+                y: scores,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'G4 Propensity',
+                line: {color: '#667eea', width: 3},
+                marker: {color: '#764ba2', size: 6}
+            };
+
+            const layout = {
+                title: '',
+                xaxis: {title: 'Sequence Position'},
+                yaxis: {title: 'G4 Propensity Score'},
+                showlegend: false,
+                margin: {l: 50, r: 20, t: 20, b: 50}
+            };
+
+            Plotly.newPlot('sequenceAnalysis', [trace], layout, {responsive: true});
+        }
+
+        // Chart 3: Thermodynamic Stability
+        function createStabilityChart() {
+            const ctx = document.getElementById('stabilityChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Parallel', 'Antiparallel', 'Hybrid'],
+                    datasets: [{
+                        label: 'ΔG (kcal/mol)',
+                        data: [-28.5, -24.2, -26.8],
+                        backgroundColor: ['#667eea', '#764ba2', '#28a745'],
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 4: Loop Length Distribution
+        function createLoopChart() {
+            const ctx = document.getElementById('loopChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+                    datasets: [{
+                        label: 'Frequency',
+                        data: [2, 5, 8, 12, 15, 18, 12, 8, 4, 2],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Loop Length (bp)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Frequency'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 5: ChIP-seq Plot
+        function createChipseqPlot() {
+            const positions = Array.from({length: 200}, (_, i) => i * 50);
+            const intensity = positions.map(p => Math.random() * 100 + 20);
+
+            const trace = {
+                x: positions,
+                y: intensity,
+                type: 'scatter',
+                mode: 'lines',
+                fill: 'tozeroy',
+                name: 'ChIP-seq Signal',
+                line: {color: '#28a745', width: 2},
+                fillcolor: 'rgba(40, 167, 69, 0.3)'
+            };
+
+            const layout = {
+                title: '',
+                xaxis: {title: 'Genomic Position (bp)'},
+                yaxis: {title: 'Signal Intensity'},
+                showlegend: false,
+                margin: {l: 50, r: 20, t: 20, b: 50}
+            };
+
+            Plotly.newPlot('chipseqPlot', [trace], layout, {responsive: true});
+        }
+
+        // Chart 6: Cell Type Comparison
+        function createCellTypeChart() {
+            const ctx = document.getElementById('cellTypeChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['G4 Formation', 'Stability', 'Chromatin Access', 'Epigenetic Marks', 'Expression'],
+                    datasets: [{
+                        label: 'HEK293',
+                        data: [85, 72, 90, 78, 65],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                        pointBorderColor: '#667eea',
+                        pointBackgroundColor: '#667eea'
+                    }, {
+                        label: 'MSC',
+                        data: [70, 68, 75, 82, 58],
+                        borderColor: '#764ba2',
+                        backgroundColor: 'rgba(118, 75, 162, 0.2)',
+                        pointBorderColor: '#764ba2',
+                        pointBackgroundColor: '#764ba2'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 7: Energy Landscape
+        function createEnergyLandscape() {
+            const x = Array.from({length: 50}, (_, i) => i);
+            const y = Array.from({length: 50}, (_, i) => i);
+            const z = [];
+
+            for (let i = 0; i < 50; i++) {
+                z[i] = [];
+                for (let j = 0; j < 50; j++) {
+                    z[i][j] = Math.sin(i/5) * Math.cos(j/5) * 10 - 20;
+                }
+            }
+
+            const trace = {
+                x: x,
+                y: y,
+                z: z,
+                type: 'surface',
+                colorscale: 'Viridis'
+            };
+
+            const layout = {
+                title: '',
+                scene: {
+                    xaxis: {title: 'Conformation 1'},
+                    yaxis: {title: 'Conformation 2'},
+                    zaxis: {title: 'Energy (kcal/mol)'}
+                },
+                margin: {l: 0, r: 0, t: 0, b: 0}
+            };
+
+            Plotly.newPlot('energyLandscape', [trace], layout, {responsive: true});
+        }
+
+        // Chart 8: Temperature Chart
+        function createTemperatureChart() {
+            const ctx = document.getElementById('temperatureChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['20', '30', '40', '50', '60', '70', '80', '90', '100'],
+                    datasets: [{
+                        label: 'Fraction Folded',
+                        data: [0.95, 0.92, 0.88, 0.82, 0.74, 0.62, 0.45, 0.25, 0.08],
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Temperature (°C)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Fraction Folded'
+                            },
+                            beginAtZero: true,
+                            max: 1
+                        }
+                    }
+                }
+            });
+        }
+
+        // Populate experimental data table
+        function populateExperimentalData() {
+            const data = [
+                {rank: 1, id: 'EXP001', cellType: 'HEK293', method: 'ChIP-seq', score: 0.92, intensity: 245, publication: 'Nature 2023'},
+                {rank: 2, id: 'EXP015', cellType: 'HEK293', method: 'G4-seq', score: 0.88, intensity: 220, publication: 'Cell 2023'},
+                {rank: 3, id: 'EXP032', cellType: 'MSC', method: 'ChIP-seq', score: 0.85, intensity: 198, publication: 'Science 2022'},
+                {rank: 4, id: 'EXP047', cellType: 'HEK293', method: 'WGBS', score: 0.82, intensity: 180, publication: 'Genome Res 2023'},
+                {rank: 5, id: 'EXP058', cellType: 'Cancer', method: 'ATAC-seq', score: 0.78, intensity: 165, publication: 'Nat Genet 2023'}
+            ];
+
+            const tbody = document.getElementById('experimentalData');
+            tbody.innerHTML = data.map(item => `
+                <tr>
+                    <td><span class="rank-badge">${item.rank}</span></td>
+                    <td>${item.id}</td>
+                    <td>${item.cellType}</td>
+                    <td>${item.method}</td>
+                    <td>${item.score}</td>
+                    <td>${item.intensity}</td>
+                    <td>${item.publication}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Back button functionality
+        function goBack() {
+            window.history.back();
+        }
+
+        // Initialize everything when page loads
+        window.addEventListener('load', function() {
+            loadQueryData();
+            initializeAnalysis();
+        });
+    </script>
+</body>
+</html>
