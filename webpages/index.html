@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G4 Omics Database</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <h2>G4 Omics DB</h2>
+            </div>
+            <nav class="nav-menu">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#prediction" class="nav-link">Prediction</a>
+                <a href="#download" class="nav-link">Download</a>
+                <a href="#feedback" class="nav-link">Feedback</a>
+                <a href="#help" class="nav-link">Help</a>
+            </nav>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section with Database Query -->
+    <section id="home" class="hero-section">
+        <div class="container">
+            <div class="header">
+                <h1 class="db-name">G4 Omics DB</h1>
+            </div>
+
+            <form id="queryForm">
+                <div class="form-group">
+                    <div class="form-row">
+                        <div class="form-label">G4 Motif</div>
+                        <div style="flex: 1; display: flex; gap: 10px;">
+                            <input type="text" class="form-input sequence-input" placeholder="Enter G4 Sequence..." style="flex: 1;" />
+                            <button type="button" class="example-btn" onclick="insertExample()">Example</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="multi-input-row">
+                        <div>
+                            <label>Cell Type</label>
+                            <select class="form-input" name="cellType" style="margin-bottom: 0;">
+                                <option value="">Select</option>
+                                <option value="HEK293">HEK293</option>
+                                <option value="MSC">MSC</option>
+                                <option value="Cancer">Cancer</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Chromatin Profile</label>
+                            <select class="form-input" name="chromatin" style="margin-bottom: 0;">
+                                <option value="">Select</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Epigenetic Profile</label>
+                            <select class="form-input" name="epigenetic" style="margin-bottom: 0;">
+                                <option value="">Select</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="decorative-line"></div>
+
+                <div class="submit-section">
+                    <button type="submit" class="submit-btn">Submit</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Introduction Section -->
+    <section id="introduction" class="intro-section">
+        <div class="section-container">
+            <div class="intro-content">
+                <div class="intro-text">
+                    <h2>About G4 Omics Database</h2>
+                    <p>G4 Omics Database is, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                    
+                    <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+                    
+                    <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.</p>
+                </div>
+                <div class="intro-image">
+                    <img src="images/G4.Summary.png" alt="G4 Structure Illustration" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="section-container">
+            <h2 class="section-title">Select Analysis</h2>
+            <div class="features-grid">
+                <div class="feature-box" onclick="navigateToPage('')">
+                    <img src="https://via.placeholder.com/120x120/28a745/ffffff?text=Analysis" alt="Prediction" />
+                    <h3>G4 Propensity</h3>
+                    <p>Computational Prediction</p>
+                </div>
+                <div class="feature-box" onclick="navigateToPage('')">
+                    <img src="https://via.placeholder.com/120x120/dc3545/ffffff?text=Viz" alt="Visualization" />
+                    <h3>Cell type based identification</h3>
+                    <p>Genome wide G4 </p>
+                </div>
+                <div class="feature-box" onclick="navigateToPage('')">
+                    <img src="https://via.placeholder.com/120x120/ffc107/ffffff?text=Search" alt="Search" />
+                    <h3>Structural Analysis</h3>
+                    <p>Modeling and Prediction</p>
+                </div>
+                <div class="feature-box" onclick="navigateToPage('')">
+                    <img src="https://via.placeholder.com/120x120/17a2b8/ffffff?text=Export" alt="Functional Analysis" />
+                    <h3>Functional Analysis</h3>
+                    <p>Relevance of G4 in Cell</p>
+                </div>
+                <div class="feature-box" onclick="navigateToPage('')">
+                    <img src="https://via.placeholder.com/120x120/6f42c1/ffffff?text=API" alt="" />
+                    <h3>Ligand Interactions</h3>
+                    <p> </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News/Updates Section -->
+    <section id="news" class="news-section">
+        <div class="section-container">
+            <h2 class="section-title">News & Updates</h2>
+            <div class="news-grid">
+                <article class="news-item">
+                    <div class="news-date">July 5, 2025</div>
+                    <h3>Database Version 1.0 Released</h3>
+                    <p>New features including structure prediction have been added to the database.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </article>
+                <article class="news-item">
+                    <div class="news-date">June 28, 2025</div>
+                    <h3>New G4 Prediction Algorithm</h3>
+                    <p>We've integrated a state-of-the-art machine learning algorithm for improved G4 structure prediction accuracy.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </article>
+                <article class="news-item">
+                    <div class="news-date">June 15, 2025</div>
+                    <h3>API Documentation Updated</h3>
+                    <p>Comprehensive API documentation with examples and tutorials will be available for developers.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>G4 Omics DB</h4>
+                    <p>A comprehensive database for G-quadruplex structures and omics data analysis.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#prediction">Prediction</a></li>
+                        <li><a href="#download">Download</a></li>
+                        <li><a href="#feedback">Feedback</a></li>
+                        <li><a href="#help">Help</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>Email: info@g4omicsdb.org</p>
+                    <p>Phone: +1 (555) 123-4567</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Follow Us</h4>
+                    <div class="social-links">
+                        <a href="#">Twitter</a>
+                        <a href="#">LinkedIn</a>
+                        <a href="#">GitHub</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 G4 Omics DB. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
