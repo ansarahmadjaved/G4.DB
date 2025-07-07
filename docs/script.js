@@ -1,4 +1,5 @@
 // Form submission handler
+// Form submission handler
 document.getElementById('queryForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
@@ -14,19 +15,27 @@ document.getElementById('queryForm').addEventListener('submit', function(e) {
         return;
     }
     
-    // Simulate database query
+    // Show loading state
     const submitBtn = document.querySelector('.submit-btn');
     const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Querying...';
+    submitBtn.textContent = 'Analyzing...';
     submitBtn.style.opacity = '0.7';
+    submitBtn.disabled = true;
     
+    // Simulate analysis delay
     setTimeout(() => {
-        submitBtn.textContent = originalText;
-        submitBtn.style.opacity = '1';
-        alert(`Query submitted!\nSequence: ${sequence}\nCell Type: ${cellType}\nChromatin Information: ${chromatin}\nEpigenetic Profile: ${epigenetic}`);
+        // Create URL parameters for the results page
+        const params = new URLSearchParams({
+            sequence: sequence,
+            cellType: cellType || 'Not specified',
+            chromatin: chromatin || 'Not specified',
+            epigenetic: epigenetic || 'Not specified'
+        });
+        
+        // Navigate to results page
+        window.location.href = `results.html?${params.toString()}`;
     }, 2000);
 });
-
 // Insert example sequence
 function insertExample() {
     const sequenceInput = document.querySelector('.sequence-input');
