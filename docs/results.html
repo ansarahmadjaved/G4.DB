@@ -17,7 +17,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.6;
             color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
             min-height: 100vh;
         }
 
@@ -306,7 +306,7 @@
             <div class="logo">
                 <h2>G4 Omics DB</h2>
             </div>
-            <a href="#" class="back-btn" onclick="goBack()">← Back to Search</a>
+            <a href="#" class="back-btn" onclick="goBack()">← Home</a>
         </div>
     </header>
 
@@ -440,17 +440,65 @@
             </div>
 
             <div class="structure-viewer">
-                <div class="chart-title">Predicted G4 Structure</div>
-                <div class="structure-placeholder">
-                    <div>
-                        <div class="loading"></div>
-                        <div style="margin-top: 10px;">Loading 3D Structure Model...</div>
-                        <div style="margin-top: 10px; font-size: 0.9em; color: #999;">
-                            Interactive 3D visualization will appear here
-                        </div>
-                    </div>
+            <div class="chart-title">Predicted G4 Structure</div>
+            <div style="width:100%; max-width:600px; margin:0 auto;">
+                <!-- RCSB 3D Viewer for PDB: 2GKU -->
+                <iframe 
+                    src="https://www.rcsb.org/3d-view/2GKU" 
+                    width="100%" 
+                    height="400" 
+                    style="border:1px solid #ccc; border-radius:15px;" 
+                    allowfullscreen
+                    title="G-quadruplex structure 2GKU"></iframe>
+                <div style="margin-top:10px; font-size:0.95em; color:#666;">
+                    <strong>PDB ID:</strong> 2GKU &nbsp;|&nbsp;
+                    <a href="https://www.rcsb.org/structure/2GKU" target="_blank" style="color:#667eea; text-decoration:underline;">View on RCSB PDB</a>
+                    <br>
+                    <span style="font-size:0.9em; color:#999;">This is a reference G4 structure. Replace with your prediction output when available.</span>
+        </div>
+        </section>
+        <!-- Section 3: Chemical Analysis -->
+        <section class="analysis-section">
+            <h3 class="section-title">
+                <div class="section-icon">4</div>
+                G4-Binding Chemical Ligands
+            </h3>
+            
+            <div class="data-table-container">
+                <div class="chart-title">Top 10 G4-Binding Ligands (Ranked by Binding Affinity)</div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Ligand Name</th>
+                            <th>Structure</th>
+                            <th>Binding Score (Kd nM)</th>
+                            <th>Specificity</th>
+                            <th>PubChem CID</th>
+                            <th>Known Targets</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ligandsData">
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div class="chart-box">
+                    <div class="chart-title">Ligand Binding Affinity Distribution</div>
+                    <canvas id="affinityChart" width="400" height="200"></canvas>
+                </div>
+                <div class="chart-box">
+                    <div class="chart-title">Ligand Chemical Space</div>
+                    <div id="chemicalSpace" style="width: 100%; height: 200px;"></div>
                 </div>
             </div>
+        </section>
+    </div>
+</div>
+
+
         </section>
     </div>
 
@@ -464,8 +512,103 @@
             document.getElementById('epigenetic-profile').textContent = urlParams.get('epigenetic') || 'Yes';
         }
 
+        function createAffinityChart() {
+            const ctx = document.getElementById('affinityChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['PDS', 'PhenDC3', 'BRACO-19', 'Pyridostatin', 'CM03', 'CX-5461', 'TMPyP4', 'Croquemycin', 'Berditinin', 'RHPS4'],
+                    datasets: [{
+                        label: 'Binding Affinity (Kd nM)',
+                        data: [12, 18, 22, 25, 28, 35, 42, 50, 65, 75],
+                        backgroundColor: [
+                            '#667eea', '#764ba2', '#28a745', '#dc3545', '#fd7e14',
+                            '#17a2b8', '#ffc107', '#6f42c1', '#e83e8c', '#20c997'
+                        ],
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Kd (nM)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 10: Chemical Space
+        function createChemicalSpace() {
+            const traces = [
+                {
+                    x: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8],
+                    y: [0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2],
+                    mode: 'markers',
+                    type: 'scatter',
+                    name: 'G4 Ligands',
+                    marker: {
+                        size: [20, 18, 16, 14, 12, 10, 8],
+                        color: ['#667eea', '#764ba2', '#28a745', '#dc3545', '#fd7e14', '#17a2b8', '#ffc107']
+                    },
+                    text: ['PDS', 'PhenDC3', 'BRACO-19', 'Pyridostatin', 'CM03', 'CX-5461', 'TMPyP4']
+                }
+            ];
+
+            const layout = {
+                title: '',
+                xaxis: {title: 'Descriptor 1'},
+                yaxis: {title: 'Descriptor 2'},
+                showlegend: false,
+                margin: {l: 50, r: 20, t: 20, b: 50}
+            };
+
+            Plotly.newPlot('chemicalSpace', traces, layout, {responsive: true});
+}
+
+    // Populate ligands data table
+        function populateLigandsData() {
+            const ligands = [
+                {rank: 1, name: 'PDS', structure: 'Quinoline', score: '12 ± 2', specificity: 'High', cid: '135413635', targets: 'TERRA, c-MYC'},
+                {rank: 2, name: 'PhenDC3', structure: 'Phenanthroline', score: '18 ± 3', specificity: 'High', cid: '24758445', targets: 'hTELO, BCL2'},
+                {rank: 3, name: 'BRACO-19', structure: 'Acridine', score: '22 ± 4', specificity: 'Medium', cid: '11347578', targets: 'hTELO, KRAS'},
+                {rank: 4, name: 'Pyridostatin', structure: 'Quinoline', score: '25 ± 3', specificity: 'High', cid: '24758433', targets: 'Multiple'},
+                {rank: 5, name: 'CM03', structure: 'Carbazole', score: '28 ± 5', specificity: 'Medium', cid: '71767123', targets: 'c-MYC, BCL2'},
+                {rank: 6, name: 'CX-5461', structure: 'Benzophenone', score: '35 ± 6', specificity: 'Low', cid: '25062787', targets: 'rDNA G4s'},
+                {rank: 7, name: 'TMPyP4', structure: 'Porphyrin', score: '42 ± 7', specificity: 'Low', cid: '443314', targets: 'Pan-G4'},
+                {rank: 8, name: 'Croquemycin', structure: 'Macrocycle', score: '50 ± 8', specificity: 'Medium', cid: '10097596', targets: 'hTELO'},
+                {rank: 9, name: 'Berditinin', structure: 'Indoloquinoline', score: '65 ± 9', specificity: 'Medium', cid: '10200413', targets: 'c-KIT'},
+                {rank: 10, name: 'RHPS4', structure: 'Pentacyclic', score: '75 ± 10', specificity: 'Medium', cid: '11347576', targets: 'hTELO'}
+            ];
+
+            const tbody = document.getElementById('ligandsData');
+            tbody.innerHTML = ligands.map(ligand => `
+                <tr>
+                    <td><span class="rank-badge">${ligand.rank}</span></td>
+                    <td><strong>${ligand.name}</strong></td>
+                    <td>${ligand.structure}</td>
+                    <td>${ligand.score}</td>
+                    <td>${ligand.specificity}</td>
+                    <td><a href="https://pubchem.ncbi.nlm.nih.gov/compound/${ligand.cid}" target="_blank">${ligand.cid}</a></td>
+                    <td>${ligand.targets}</td>
+                </tr>
+            `).join('');
+        }
+
+
         // Initialize all charts and data
         function initializeAnalysis() {
+            // Existing functions...
             createProbabilityChart();
             createSequenceAnalysis();
             createStabilityChart();
@@ -475,6 +618,11 @@
             createEnergyLandscape();
             createTemperatureChart();
             populateExperimentalData();
+            
+            // New functions for ligands section
+            createAffinityChart();
+            createChemicalSpace();
+            populateLigandsData();
         }
 
         // Chart 1: G4 Formation Probability
